@@ -8,8 +8,8 @@ Each project is documented with a clear business scenario, methodology, results,
 ## 📂 Project Categories  
 
 - **Machine Learning**  
-  Predictive modeling projects using regression, classification, and model fine-tuning.  
-- [**Customer Churn Prediction with Logistic Regression**](machine-learning/customer-churn-logistic-regression/Customer%20Churn%20Prediction.ipynb)  
+
+P1.[**Customer Churn Prediction with Logistic Regression**](machine-learning/customer-churn-logistic-regression/Customer%20Churn%20Prediction.ipynb)  
   A case study predicting telecom customer churn using Logistic Regression.  
   Includes model evaluation (log loss), feature fine-tuning experiments, and coefficient interpretation for business strategy.  
 
