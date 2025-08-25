@@ -2,8 +2,7 @@
 
 Welcome to my Data Science Portfolio 👩🏻‍💻.
 
-This repository showcases a collection of projects that highlight my skills in **data analysis, machine learning, and model evaluation**.  
-Each project is documented with a clear business scenario, methodology, results, and actionable insights.  
+This repository showcases a collection of projects that highlight my skills in **data analysis, machine learning, and model evaluation**.  Each project is documented with a clear business scenario, methodology, results, and actionable insights.  
 
 ## 📂 Project Categories  
 
