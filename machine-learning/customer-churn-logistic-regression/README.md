@@ -13,4 +13,4 @@ It includes model evaluation (log loss) and feature fine-tuning experiments.
 - Best model (+callcard + wireless): log loss ~0.539  
 - Key takeaway: tenure strongly reduces churn risk; removing `income` or `employ` worsens performance.
 
-[Open the full notebook](machine-learning/custom$er-churn-logistic-regression/Customer%20Churn%20Prediction.ipynb)
+[Open the full notebook](machine-learning/customer-churn-logistic-regression/Customer Churn Prediction.ipynb)
