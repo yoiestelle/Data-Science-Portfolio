@@ -13,3 +13,8 @@ This dataset contains detailed records of Falcon 9 missions, including launch si
 - Reusability Milestone: The first successful ground pad landing occurred on 2015-12-22.
 - Drone Ship Success: Boosters such as F9 FT B1022 and B1026 succeeded with medium payloads.
 - Mission Outcomes: Out of 101 missions, 99 succeeded, with only 1 in-flight failure and 1 unclear payload status. This indicates a 97%+ success rate in payload delivery.
+- Landing success improved markedly over time: overall success rate rose from 0% (2010–2014) to ~78% in 2017, ~91% in 2019, and ~88% in 2020. When excluding “No attempt”/“Precluded” launches, the success rate on attempted recoveries is even higher — highlighting SpaceX’s rapid iteration on reusability.
+- SpaceX itself is the largest customer, with ~185,000 kg of payload delivered — highlighting how Falcon 9 has been used extensively for internal projects.
+Iridium Communications (67,200 kg) and NASA CRS (~45,600 kg) are also major customers, showing SpaceX’s strong role in both commercial satellite deployment and government partnerships.
+Other contributors include Planet Labs and SES, pointing to SpaceX’s diverse customer base across communications, Earth observation, and broadcasting.
+These results underscore that while SpaceX relies heavily on its own launches, it has also become a critical provider for government missions and private industry.
