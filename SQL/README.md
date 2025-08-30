@@ -6,6 +6,11 @@ SpaceX has gained worldwide attention for a series of historic milestones. It is
 Predicting whether the first stage will land successfully is critical, since successful landings lower costs and improve competitiveness. These insights are valuable for competitors, investors, and policymakers who want to evaluate SpaceX’s market position or bid for launch contracts.
 This dataset contains detailed records of Falcon 9 missions, including launch sites, payloads, customers, booster versions, and mission outcomes. Using SQL queries, I analyze the dataset to answer key business questions about payload distribution, customer demand, launch success rates, and booster performance.
 
+## Dataset Description
+This dataset is provided as part of the IBM Data Science Capstone project. It is compiled from publicly available launch records (SpaceX, NASA, Wikipedia) and contains detailed information on Falcon 9 launches. Each record corresponds to a Falcon 9 mission and includes fields such as launch date, booster version, payload mass, launch site, customer, orbit type, mission outcome, and landing outcome.
+
+While this dataset is curated for educational purposes, it is based on real mission data and provides a reliable representation of SpaceX’s launch history up to the point of compilation.
+
 ## Key Findings
 - Launch Sites: Falcon 9 missions launched mainly from Cape Canaveral (CCAFS LC-40, SLC-40), Kennedy Space Center (LC-39A), and Vandenberg (SLC-4E).
 - Customers: NASA CRS contributed significant payload mass, showing SpaceX’s deep partnership with NASA.
