@@ -12,4 +12,4 @@ This dataset contains detailed records of Falcon 9 missions, including launch si
 - Payload Mass: The average payload mass for F9 v1.1 boosters was ~2,928 kg.
 - Reusability Milestone: The first successful ground pad landing occurred on 2015-12-22.
 - Drone Ship Success: Boosters such as F9 FT B1022 and B1026 succeeded with medium payloads.
-- Mission Outcomes: Out of 100+ missions, 98 were successful, with very few failures.
+- Mission Outcomes: Out of 101 missions, 99 succeeded, with only 1 in-flight failure and 1 unclear payload status. This indicates a 97%+ success rate in payload delivery.
