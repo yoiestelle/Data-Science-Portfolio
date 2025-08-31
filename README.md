@@ -8,7 +8,7 @@ This repository showcases a collection of projects that highlight my skills in *
 
 - **SQL**
 
-[**SpaceX Falcon 9 Launch Analysis**](SQL/SpaceX_EDA_SQLquery.ipynb)
+[**SpaceX Falcon 9 Launch Analysis**](SQL/SpaceX_EDA)
 
    Conducted exploratory data analysis (EDA) on SpaceX Falcon 9 launch records using SQL.  
 
