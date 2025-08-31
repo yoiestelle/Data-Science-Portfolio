@@ -19,8 +19,8 @@ P1. [**SpaceX Falcon 9 Launch Analysis**](SQL/SpaceX_EDA_SQLquery.ipynb)
 - **Machine Learning**  
 
 P1.[**Customer Churn Prediction with Logistic Regression**](machine-learning/customer-churn-logistic-regression/Customer%20Churn%20Prediction.ipynb)  
-  A case study predicting telecom customer churn using Logistic Regression.  
-  Includes model evaluation (log loss), feature fine-tuning experiments, and coefficient interpretation for business strategy.  
+    A case study predicting telecom customer churn using Logistic Regression.  
+    Includes model evaluation (log loss), feature fine-tuning experiments, and coefficient interpretation for business strategy.  
 
 ---
 
