@@ -5,6 +5,14 @@ Welcome to my Data Science Portfolio 👩🏻‍💻.
 This repository showcases a collection of projects that highlight my skills in **data analysis, machine learning, and model evaluation**.  Each project is documented with a clear business scenario, methodology, results, and actionable insights.  
 
 ## 📂 Project Categories  
+- **SQL**  
+P1. [**SpaceX Falcon 9 Launch Analysis**](SQL/SpaceX_EDA_SQLquery.ipynb)
+   Conducted exploratory data analysis (EDA) on SpaceX Falcon 9 launch records using SQL.  
+   Key insights include:
+   - Launch site performance  
+   - Customer payload contributions  
+   - Booster success rates  
+   - SpaceX’s reusability milestones  
 
 - **Machine Learning**  
 
