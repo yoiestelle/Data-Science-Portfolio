@@ -11,12 +11,6 @@ This repository showcases a collection of projects that highlight my skills in *
 [**SpaceX Falcon 9 Launch Analysis**](SQL/SpaceX_EDA_SQLquery.ipynb)
 
    Conducted exploratory data analysis (EDA) on SpaceX Falcon 9 launch records using SQL.  
-   Key insights include:
-   - Launch site performance  
-   - Customer payload contributions  
-   - Booster success rates  
-   - SpaceX’s reusability milestones  
-
 
 - **Machine Learning**  
 
