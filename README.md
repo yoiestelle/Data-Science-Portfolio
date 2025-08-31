@@ -20,9 +20,7 @@ This repository showcases a collection of projects that highlight my skills in *
 - **Machine Learning**  
 
 [**Customer Churn Prediction with Logistic Regression**](machine-learning/customer-churn-logistic-regression/Customer%20Churn%20Prediction.ipynb)  
-    
-    A case study predicting telecom customer churn using Logistic Regression.  
-    Includes model evaluation (log loss), feature fine-tuning experiments, and coefficient interpretation for business strategy.  
+    A case study predicting telecom customer churn using Logistic Regression. Includes model evaluation (log loss), feature fine-tuning experiments, and coefficient interpretation for business strategy.  
 
 ---
 
