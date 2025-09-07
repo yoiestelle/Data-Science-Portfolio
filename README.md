@@ -8,7 +8,7 @@ This repository showcases a collection of projects that highlight my skills in *
 
 - **R**
 
-[**Policy Barriers to College: Analyzing In-State Tuition Access for Undocumented Youth**(R/Logistic%20Regression%20Analysis%20of%20Education%20%26%20Employment%20Data/2023_log_regression.pdf)
+[**Policy Barriers to College: Analyzing In-State Tuition Access for Undocumented Youth**](R/Logistic%20Regression%20Analysis%20of%20Education%20%26%20Employment%20Data/2023_log_regression.pdf)
 
 Tools & Methods: R (survey package, dplyr, ggeffects, ggplot2); Survey-weighted logistic regression (`svyglm`); Data cleaning, policy variable construction, predictive modeling
 
