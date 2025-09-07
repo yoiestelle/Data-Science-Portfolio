@@ -8,7 +8,7 @@ This repository showcases a collection of projects that highlight my skills in *
 
 - **Machine Learning**
 
-[**PJM Hourly Energy Consumption EDA & Forecasting**]
+[**PJM Hourly Energy Consumption EDA & Forecasting**](machine-learning/Energy_Consumption_EDA%20_Forecasting/Energy_Consumption_EDA%20_Forecasting%20.ipynb)
 Skills: Python (pandas, matplotlib, seaborn, scikit-learn) · Exploratory Data Analysis · Data Visualization · Time Series Forecasting · Feature Engineering
 
 This project explores and forecasts electricity demand using PJM hourly energy consumption data.  
