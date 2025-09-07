@@ -1,0 +1,593 @@
+---
+title: "R Notebook"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    df_print: paged
+  word_document:
+    toc: true
+---
+
+
+\pagebreak
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+```{r}
+rm(list=ls())
+```
+
+
+```{r}
+library(dplyr)
+library(forcats)
+library(survey)
+library(tidyr)
+library(car)
+library(haven)
+library(survey)
+library(tidyr)
+library(broom)
+library(ggplot2)
+library(ggeffects)
+library(ggeffects)
+library(Hmisc)
+library(readxl)
+
+# new 2023 ACS data
+undoc23e11 <- read_dta("/Users/estellepan/Desktop/AIC/undocumented_student/undoc_2023_acs_02_27_2025.dta")
+
+# state-level enrollment & employment data 
+state_enroll <- read.csv("/Users/estellepan/Desktop/AIC/undocumented_student/state_enroll_long(Sheet1).csv")
+```
+
+
+```{r}
+# Filter for undocumented youth aged 18–24 
+# who have completed high school (GED or diploma) 
+# but have NOT completed a college degree
+
+undoc_youth <- undoc23e11 %>%
+  filter(
+    undoc2 == 1,                  # Undocumented immigrants (clean, NA-free flag)
+    age >= 18 & age <= 24,        # Target age range per study definition
+    educd %in% c(                 # Educational attainment codes (2023 ACS only):
+      063,  # Regular high school diploma
+      064,  # GED or alternative credential
+      065,  # Some college, less than 1 year
+      071,  # 1+ years of college credit, no degree
+      081   # Associate's degree, type not specified
+    )
+  )
+
+##  People who completed HS and are in college or have some college, exclude people who already have college degrees 
+```
+
+
+```{r}
+# dataset excluding people who already have college degrees 
+undoc23e1 <- undoc_youth %>%
+  left_join(state_enroll, by = c("statefip" = "StateFIP"))
+```
+
+
+```{r}
+# remove labelled metadata 
+undoc23e1<-zap_labels(undoc23e1)
+undoc23e1$state_employ_rate<-zap_formats(undoc23e1$state_employ_rate)
+undoc23e1$state_enroll_rate<-zap_formats(undoc23e1$state_enroll_rate)
+summary(undoc23e1$state_employ_rate)
+summary(undoc23e1$state_enroll_rate)
+```
+
+```{r}
+# Explore Key Variables 
+summary(undoc23e1$age)
+table(undoc23e1$undoc)
+```
+
+```{r}
+colSums(is.na(undoc23e1))
+```
+
+
+
+# Cleaning variables again and doing some prelim stats before regressions
+
+## Re-making state employ into a factor incase of linearity of logit violations
+
+```{r}
+undoc23e1$state_employ23 <- as.numeric(undoc23e1$state_employ_rate)
+hist(undoc23e1$state_employ23)
+```
+
+```{r}
+# Why square it? To capture curvature in the relationship if state_employ_rate has a nonlinear effect on outcome.
+undoc23e1$state_emp23_sq<-undoc23e1$state_employ23^2
+hist(undoc23e1$state_emp23_sq)
+```
+
+```{r categorical emp rate 23}
+summary(undoc23e1$state_employ23)
+undoc23e1$state_employ23_cat<-cut(undoc23e1$state_employ23,
+                           breaks=3,
+                           labels=c("1","2","3"))
+
+table(undoc23e1$state_employ23_cat)
+```
+
+```{r}
+undoc23e1%>%group_by(state_employ23_cat)%>%
+  summarise(min=min(state_employ23),
+            max=max(state_employ23))
+```  
+
+
+## remaking state enrollment into a factor incase of linearity of logit violations 
+
+
+```{r doing a squared enroll rate}
+undoc23e1$state_enroll23 <- as.numeric(undoc23e1$state_enroll_rate)
+hist(undoc23e1$state_enroll23)
+```
+
+```{r}
+undoc23e1$state_enroll23_sq<-undoc23e1$state_enroll23^2
+hist(undoc23e1$state_enroll23_sq)
+```
+
+
+```{r}
+undoc23e1$state_enroll23_cat<-cut(undoc23e1$state_enroll23,
+                           breaks=3,
+                           labels=c("1","2","3"))
+
+table(undoc23e1$state_enroll23_cat)
+
+undoc23e1%>%group_by(state_enroll23_cat)%>%
+  summarise(min=min(state_enroll23),
+            max=max(state_enroll23))
+```
+
+
+### Household income categories
+```{r}
+# Use quantile() with cut() to ensure balanced group sizes
+undoc23e1$hhincome_cat <- cut(
+  undoc23e1$hhincome,
+  breaks = quantile(undoc23e1$hhincome, probs = c(0, 1/3, 2/3, 1), na.rm = TRUE),
+  labels = c("1", "2", "3"),
+  include.lowest = TRUE
+)
+table(undoc23e1$hhincome_cat)
+
+undoc23e1 %>%
+  group_by(hhincome_cat) %>%
+  summarise(
+    min = min(hhincome, na.rm = TRUE),
+    max = max(hhincome, na.rm = TRUE)
+  )
+
+```
+
+
+```{r}
+summary(undoc23e1$age)
+```
+
+
+# Logistic Regression Set Up
+
+
+
+## setting up the svy object 
+```{r making person id variable}
+undoc23e1$ids<-undoc23e1$serial+undoc23e1$pernum
+```
+
+## final model we didn't use race
+```{r race4 and race5}
+undoc23e1$race3 <- factor(undoc23e1$race,
+                         levels = 1:9,
+                         labels = c("White", "Black", "AIAN", "Chinese", "Japanese", 
+                                    "API_other", "Other", "TwoRaces", "ThreePlus"))
+```
+
+```{r}
+#  collapsing "Asian or Pacific Islander (other)" into a broader "other" group
+undoc23e1$race4<-fct_recode(undoc23e1$race3,
+                           "other"="API_other")
+# Sets "Black" as the reference group for modeling in race5
+undoc23e1$race5<-relevel(undoc23e1$race4, ref="Black")
+# using the original 9-category race3
+undoc23e1$race6<-relevel(undoc23e1$race3, ref="Black")
+```
+
+```{r setting up interactions for box tidewell}
+# helps detect or model non-linear effects in logit models for continuous predictors
+undoc23e1$box_enroll23<-undoc23e1$state_enroll23*log(undoc23e1$state_enroll23)
+undoc23e1$box_employ23<-undoc23e1$state_employ23*log(undoc23e1$state_employ23)
+```
+
+
+```{r}
+#Create employ Variable
+undoc23e1$employ <- ifelse(undoc23e1$empstat == 1, 1, 0)
+```
+
+```{r}
+# Define state FIPS codes for in-state tuition access
+# WA, OR, CA, NV, UT, AZ, CO, NM, NE, KS, OK, TX, HI, MN, IL, KY, VA, FL, NY, VT, MA, CT, RI, NJ, MD, DC
+isrt_states <- c(53, 41, 6, 32, 49, 4, 8, 35, 31, 20, 40, 48, 15,
+                        27, 17, 21, 51, 12, 36, 50, 25, 9, 44, 34, 24, 11)
+
+# Create binary indicator variable
+undoc23e1$isrt <- ifelse(
+  undoc23e1$statefip %in% isrt_states, 1, 0
+)
+```
+
+```{r}
+# Define state FIPS codes for states that allow driver's licenses for undocumented immigrants
+drive_lic_states <- c(6, 8, 9, 10, 11, 15, 17, 24, 25, 27, 32, 34, 35, 36, 41, 44, 49, 50, 51, 53)
+
+# Create binary indicator variable
+undoc23e1$driveLic <- ifelse(undoc23e1$statefip %in% drive_lic_states, 1, 0)
+```
+
+
+# combined Central America, Caribbean, and South America as 1 and the rest as 0.  
+
+
+```{r}
+# Used `dpl` (summary birthplace variable) instead of `dpld` because:
+# 1. `dpl` has full and consistent coverage across the ACS 2023 sample.
+# 2. `dpld` is more granular but includes many missing or unavailable categories in the current dataset.
+# 3. `dpl` captures all major Latinx regional categories needed (e.g., Central America, Caribbean, South America, excluding mexico).
+# 4. Using `dpl` maintains consistency with prior studies' region-level groupings.
+undoc23e1$birthplace1 <- case_when(
+  undoc23e1$bpl %in% c(210, 250, 260, 299, 300) ~ "Cam Sam",  # Central America, Caribbean, South America
+  TRUE ~ "Other"
+)
+```
+
+```{r}
+# subset for lat but excluding Mexico , use this for further regression 
+lat_sub1 <- subset(undoc23e1, birthplace1=="Cam Sam")
+```
+
+```{r states in model}
+undoc23e1%>%group_by(state)%>%
+  summarise(n=sum(perwt))%>%
+  print(n=50)
+```
+
+
+
+
+
+
+```{r}
+save(undoc23e1, file="final_undoc23e.RData")
+```
+
+
+```{r}
+# svydesign 
+# creates a survey-weighted design object using perwt (person weight).
+undoc_data1<-svydesign(id=~ids, 
+                         weights=~perwt,
+                       data=undoc23e1) 
+```
+
+```{r}
+
+lat_sub1<-svydesign(id=~ids, 
+                         weights=~perwt,
+                       data=lat_sub1) 
+
+```
+
+
+# Running Regressions 
+
+```{r}
+# check following variables used in the prior regression model are not found in the current dataset:
+
+model_vars <- c("attending_college", "isrt", "driveLic", "sex", "age",
+                "birthplace1", "daca_imm", "employ", "hhincome_cat",
+                "state_enroll23", "state_employ23", "box_enroll23", "box_employ23")
+
+missing_vars <- model_vars[!(model_vars %in% names(undoc_data1$variables))]
+missing_vars
+```
+
+### Box Tidewell for state enrollment and employment in 2023
+
+```{r}
+box_simple <- svyglm(attending_college ~ sex + age + hhincome_cat,
+                     family = quasibinomial,
+                     design = undoc_data1,
+                     na.action = na.omit)
+summary(box_simple)
+```
+
+
+```{r}
+# survey-weighted logistic regression using the svyglm() function from the survey package
+# It models the probability of attending college among undocumented youth using various predictors.
+box1<-svyglm(attending_college~ isrt+ driveLic+ sex+age+birthplace1+daca_imm+
+                      hhincome_cat+state_enroll23+state_employ23+
+                      box_enroll23+box_employ23,
+                    family=quasibinomial,
+                    design=undoc_data1, 
+                    na.action = na.omit)
+summary(box1)
+```
+ 
+## Model 2: logit 1b with employment and enrollment rates for 2023 (enrollment is categorical)
+
+
+```{r logit1b with enroll23 and employ23}
+
+logit1b<-(svyglm(attending_college~isrt+driveLic+
+                      sex+age+birthplace1+daca_imm+
+                      employ+hhincome_cat+
+                      state_enroll23_cat+state_employ23,
+                    family=quasibinomial,
+                    design=undoc_data1, 
+                    na.action = na.omit))
+# tidy summary
+tidy(logit1b)%>% 
+  mutate(estimate=round(estimate,2),
+         std.error=round(std.error,2),
+         statistic=round(statistic,2),
+         or=round(exp(estimate),2),
+         p.value=round(p.value,4))
+```
+
+
+### Wald test for logit1b (using 2023 employment and enrollment data)
+```{r wald tests for logit1}
+
+wald_test_full_logit1_23 <- regTermTest(logit1b, ~isrt+driveLic+
+                      sex+age+birthplace2+daca_imm+
+                      employ+hhincome_cat+
+                      state_enroll23_cat+state_employ23)
+print(wald_test_full_logit1_23)
+
+# wald test for isrt for logit1
+
+wald_test_isrtlog1<-regTermTest(logit1b, ~isrt)
+print(wald_test_isrtlog1) ## significant nice
+```
+
+
+### Predicted probs for logit1b
+
+```{r logit1b bpl}
+#visualize the predicted probabilities of college attendance based on birthplace1 from logit1b model. 
+log1b_pred_bpl<-ggpredict(logit1b, terms="birthplace1")
+print(as.data.frame(log1b_pred_bpl))
+log1b_pred_bpl
+plot(log1b_pred_bpl)
+```
+
+```{r logit1b isrt}
+log1b_pred_isrt<-ggpredict(logit1b, terms="isrt")
+print(as.data.frame(log1b_pred_isrt))
+log1b_pred_isrt
+plot(log1b_pred_isrt)
+```
+
+
+
+
+## logit2: driver license and Isrt interaction  
+
+
+```{r}
+logit2<-(svyglm(attending_college~isrt+driveLic+
+                      sex+age+birthplace1+daca_imm+
+                      employ+hhincome_cat+
+                      state_enroll23_cat+state_employ23+isrt:driveLic,
+                    family=quasibinomial,
+                    design=undoc_data1, 
+                    na.action = na.omit))
+# tidy summary
+tidy(logit2)%>% 
+  mutate(estimate=round(estimate,2),
+         std.error=round(std.error,2),
+         statistic=round(statistic,2),
+         or=round(exp(estimate),2),
+         p.value=round(p.value,4)) 
+```
+
+
+
+## logit 3: An employed and ISRT interaction
+```{r}
+logit3<-(svyglm(attending_college~isrt+driveLic+
+                      sex+age+birthplace1+daca_imm+
+                      employ+hhincome_cat+
+                      state_enroll23_cat+state_employ23+isrt:employ,
+                    family=quasibinomial,
+                    design=undoc_data1, 
+                    na.action = na.omit))
+# tidy summary
+tidy(logit3)%>% 
+  mutate(estimate=round(estimate,2),
+         std.error=round(std.error,2),
+         statistic=round(statistic,2),
+         or=round(exp(estimate),2),
+         p.value=round(p.value,4)) ## almost significant--interesting
+```
+
+### predicted probabilities for logit3--employed X isrt interaction 
+
+```{r}
+logit3_pred<-ggpredict(logit3, terms=c("isrt","employ"))
+print(as.data.frame(logit3_pred))
+logit3_pred
+plot(logit3_pred)
+```
+
+## logit 4: birthplace and isrt interaction 
+
+```{r}
+logit4<-(svyglm(attending_college~isrt+driveLic+
+                      sex+age+birthplace1+daca_imm+
+                      employ+hhincome_cat+
+                      state_enroll23_cat+state_employ23+isrt:birthplace1,
+                    family=quasibinomial,
+                    design=undoc_data1, 
+                    na.action = na.omit))
+# tidy summary
+tidy(logit4)%>% 
+  mutate(estimate=round(estimate,2),
+         std.error=round(std.error,2),
+         statistic=round(statistic,2),
+         or=round(exp(estimate),2),p.value=round(p.value,4)) 
+```
+### predicted probabilities for isrt X birthplace interaction
+```{r}
+logit4_pred<-ggpredict(logit4, terms=c("birthplace1","isrt"))
+logit4_pred
+print(as.data.frame(logit4_pred))
+plot(logit4_pred)
+```
+
+## Logit 5: Race instead of birthplace 
+
+```{r}
+logit5<-(svyglm(attending_college~isrt+driveLic+
+                      sex+age+race3+daca_imm+
+                      employ+hhincome_cat+
+                      state_enroll23_cat+state_employ23,
+                    family=quasibinomial,
+                    design=undoc_data1, 
+                    na.action = na.omit))
+# tidy summary
+tidy(logit5)%>% 
+  mutate(estimate=round(estimate,2),
+         std.error=round(std.error,2),
+         statistic=round(statistic,2),
+         or=round(exp(estimate),2),p.value=round(p.value,4)) # isrt isn't significant
+
+```  
+
+
+## Logit6: ISRT X state employment rate interaction  
+
+```{r}
+logit6<-(svyglm(attending_college~isrt+driveLic+
+                      sex+age+race3+daca_imm+
+                      employ+hhincome_cat+
+                      state_enroll23_cat+state_employ23+state_enroll23_cat:isrt,
+                    family=quasibinomial,
+                    design=undoc_data1, 
+                    na.action = na.omit))
+# tidy summary
+tidy(logit6)%>% 
+  mutate(estimate=round(estimate,2),
+         std.error=round(std.error,2),
+         statistic=round(statistic,2),
+         or=round(exp(estimate),2),p.value=round(p.value,4)) # isrt isn't significant
+```
+### predicted probs for logit6 (isrt X state enroll interaction)
+```{r}
+log6_pred<-ggpredict(logit6, terms=c("state_enroll23_cat", "isrt"))
+log6_pred
+print(as.data.frame(log6_pred))
+plot(log6_pred)
+```
+
+# Logistic Regressions with the Latinx sub-set sample  
+
+## log_latx1 with region birthplace 3 and 2023 employment and enrollment data
+
+```{r}
+
+log_latx1<-(svyglm(attending_college~isrt+driveLic+
+                      sex+age+daca_imm+
+                      employ+hhincome_cat+
+                      state_enroll23_cat+state_employ23_cat,
+                    family=quasibinomial,
+                    design=lat_sub1, 
+                    na.action = na.omit))
+
+tidy(log_latx1)%>% 
+  mutate(estimate=round(estimate,2),
+         std.error=round(std.error,2),
+         statistic=round(statistic,2),
+         or=round(exp(estimate),2),
+         p.value=round(p.value,4))
+```
+
+### Wald Test for effect of ISRT with Latinx sub-sample
+
+```{r wald tests for log_latx1}
+
+wald_full_latx1 <- regTermTest(log_latx1, ~isrt+driveLic+
+                      sex+age+daca_imm+
+                      employ+hhincome_cat+
+                      state_enroll23+state_employ23)
+print(wald_full_latx1)
+
+# wald test for isrt for logit1
+
+wald_isrt_latx1<-regTermTest(log_latx1, ~isrt)
+print(wald_isrt_latx1) ## significant nice
+```
+### predicted probabilities for log_latx1
+```{r}
+log_latx1_pred1<-ggpredict(log_latx1, terms=c("isrt"))
+log_latx1_pred1
+print(as.data.frame(log_latx1_pred1))
+plot(log_latx1_pred1)
+```
+
+
+
+```{r}
+# the effect of DACA status on college attendance differs by household income level.
+logit_daca_income <- svyglm(
+  attending_college ~ daca_imm * hhincome_cat + 
+    sex + age + isrt + driveLic + employ + 
+    state_enroll23_cat + state_employ23_cat,
+  design = undoc_data1,
+  family = quasibinomial,
+  na.action = na.omit
+)
+summary(logit_daca_income)
+```
+
+
+
+```{r}
+undoc_data_18_21 <- subset(undoc_data1, age >= 18 & age <= 21)
+logit_age1821 <- svyglm(
+  attending_college ~ isrt + driveLic + sex + age + race3 + daca_imm +
+  employ + hhincome_cat + state_enroll23_cat + state_employ23_cat,
+  design = undoc_data_18_21,
+  family = quasibinomial
+)
+summary(logit_age1821)
+```
+
+```{r}
+lat_sub1_age1821 <- subset(lat_sub1, age >= 18 & age <= 21)
+log_latx1_age1821 <- svyglm(
+  attending_college ~ isrt + driveLic + sex + age + daca_imm +
+  employ + hhincome_cat + state_enroll23_cat + state_employ23_cat,
+  design = lat_sub1_age1821,
+  family = quasibinomial
+)
+summary(log_latx1_age1821)
+```
+
+
+
