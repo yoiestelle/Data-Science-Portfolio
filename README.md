@@ -14,11 +14,10 @@ Skills: Python (pandas, matplotlib, seaborn, scikit-learn) · Exploratory Data A
 This project explores and forecasts electricity demand using PJM hourly energy consumption data.  
 
 **Distribution of Load by Region**  
-![Distribution of Load by Region](machine-learning/Energy_Consumption_EDA_Forecasting/Images/distribution_load_by_region.png)
+![Distribution of Load by Region](machine-learning/Energy_Consumption_EDA%20_Forecasting/Images/distribution_load_by_region.png)
 
 **East MW Forecast vs Actual (First 14 Days)**  
-![East MW Forecast vs Actual](machine-learning/Energy_Consumption_EDA_Forecasting/Images/East%20MW%20Forecast%20vs%20Actual%20(First%2014%20Days).png)
-
+![East MW Forecast vs Actual](machine-learning/Energy_Consumption_EDA%20_Forecasting/Images/East%20MW%20Forecast%20vs%20Actual%20(First%2014%20Days).png)
 
 [**Customer Churn Prediction with Logistic Regression**](machine-learning/customer-churn-logistic-regression/Customer%20Churn%20Prediction.ipynb)  
 Skills: Python (scikit-learn) · Logistic Regression · Model Evaluation · Feature Tuning
