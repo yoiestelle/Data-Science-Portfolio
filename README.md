@@ -25,7 +25,7 @@ Skills: Python (scikit-learn) · Logistic Regression · Model Evaluation · Feat
 
 Developed a predictive model for telecom customer churn. Includes feature fine-tuning, coefficient interpretation, and model evaluation using log loss. Demonstrates ability to link predictive modeling to business strategy and customer retention.  
 
-(machine-learning/customer-churn-logistic-regression/Images/coi.png)
+[**Coefficients of the Fine-Tuned Model**](machine-learning/customer-churn-logistic-regression/Images/coi.png)  
 
 - **SQL**
 
