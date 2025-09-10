@@ -6,15 +6,6 @@ This repository showcases a collection of projects that highlight my skills in *
 
 ## 📂 Project Categories  
 
-- **R**
-
-[**Policy Barriers to College: Analyzing In-State Tuition Access for Undocumented Youth**](R/Logistic%20Regression%20Analysis%20of%20Education%20%26%20Employment%20Data/2023_log_regression.pdf)
-
-Tools & Methods: R (survey package, dplyr, ggeffects, ggplot2); Survey-weighted logistic regression (`svyglm`); Data cleaning, policy variable construction, predictive modeling
-
-This project is part of my work with the American Immigration Council and examines how state-level policies — specifically, in-state tuition eligibility and driver’s license access — influence college attendance rates among undocumented youth in the United States. Using 2023 American Community Survey (ACS) microdata, I construct a logistic regression model to estimate how these policies, along with demographic and economic factors, shape postsecondary enrollment outcomes.
-
-
 - **Python**
 
 [**PJM Hourly Energy Consumption EDA & Forecasting**](machine-learning/Energy_Consumption_EDA%20_Forecasting/Energy_Consumption_EDA%20_Forecasting%20.ipynb)
@@ -35,6 +26,14 @@ Tools & Methods: Python (scikit-learn) · Logistic Regression · Model Evaluatio
 Developed a predictive model for telecom customer churn. Includes feature fine-tuning, coefficient interpretation, and model evaluation using log loss. Demonstrates ability to link predictive modeling to business strategy and customer retention.  
 
 ![Coefficients of the Fine-Tuned Model](machine-learning/customer-churn-logistic-regression/Images/coi.png)  
+
+- **R**
+
+[**Policy Barriers to College: Analyzing In-State Tuition Access for Undocumented Youth**](R/Logistic%20Regression%20Analysis%20of%20Education%20%26%20Employment%20Data/2023_log_regression.pdf)
+
+Tools & Methods: R (survey package, dplyr, ggeffects, ggplot2); Survey-weighted logistic regression (`svyglm`); Data cleaning, policy variable construction, predictive modeling
+
+This project is part of my work with the American Immigration Council and examines how state-level policies — specifically, in-state tuition eligibility and driver’s license access — influence college attendance rates among undocumented youth in the United States. Using 2023 American Community Survey (ACS) microdata, I construct a logistic regression model to estimate how these policies, along with demographic and economic factors, shape postsecondary enrollment outcomes.
 
 - **SQL**
 
